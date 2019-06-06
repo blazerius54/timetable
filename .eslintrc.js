@@ -24,6 +24,8 @@ module.exports = {
   },
   rules:  {
     "prettier/prettier": ["error", prettierOptions],
+    'no-plusplus': 'off',
+    'eqeqeq': 'off',
     "arrow-body-style": [2, "as-needed"],
     "react/prefer-stateless-function": [0, { "ignorePureComponents": true }],
     "class-methods-use-this": 0,
