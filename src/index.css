@@ -27,13 +27,18 @@ p {
   flex-direction: column;
   border: 2px solid #b5d2bd;
   border-radius: 3px;
-  padding: 30px;
+  padding: 10px 30px 30px ;
 }
 
 .calendar-body {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   width: 100%;
+}
+
+.month-main {
+  display: flex;
+  justify-content: center;
 }
 
 .day {
