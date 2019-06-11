@@ -20,9 +20,17 @@ p {
   margin: 0;
 }
 
-.calendar-wrapper {
+#root {
   width: 300px;
-  margin: 100px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 50px auto;
+}
+
+.calendar-wrapper {
+  width: 100%;
+  margin: 50px auto;
   display: flex;
   flex-direction: column;
   border: 2px solid #b5d2bd;
@@ -56,7 +64,7 @@ p {
   cursor: pointer;
 }
 
-.workDay {
+.work-day {
   background: #70b97f;
   color: #fff;
 }
@@ -75,4 +83,15 @@ p {
 
 .week-end {
   color: #000;
+}
+
+.legend-wrapper {
+  display: flex;
+  align-items: flex-start;
+}
+
+.work-day-label {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
 }

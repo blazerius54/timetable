@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { months } from './data';
+import Legend from './components/Legend';
 
 function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -53,7 +54,6 @@ function App() {
 
   return (
     <>
-      <button onClick={switchMonth}>next</button>
       <div className="calendar-wrapper">
         <div className="month-main">{months[currentDate.getMonth()].rus}</div>
         <div className="days-name">
@@ -74,7 +74,7 @@ function App() {
                 return (
                   <div
                     key={day}
-                    className={`day ${workDay && 'workDay'}
+                    className={`day ${workDay && 'work-day'}
                     ${(weekDay == 0 || weekDay == 6) && 'week-end'}`}
                   >
                     {day}
@@ -85,6 +85,7 @@ function App() {
             })}
         </div>
       </div>
+      <Legend />
     </>
   );
 }
