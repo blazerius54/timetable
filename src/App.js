@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { months } from './data';
 import Legend from './components/Legend';
+import { setLocalStorage, getLocalStorage } from './helpers';
 
 function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [workDays, setWorkDays] = useState(2);
   const [days, setDays] = useState([]);
+  const overworkDays = getLocalStorage('workDays');
 
   const switchMonth = () => {
     const dateWithNewMonth = currentDate;
@@ -29,13 +31,15 @@ function App() {
 
     for (let i = 0; i < totalDays + elementsToAdd; i++) {
       if (i < elementsToAdd) {
-        newDays.unshift({});
+        newDays.unshift({ id: i });
       } else {
         newDays.push({
           fullDate: new Date(newCurrentDate),
-          workDay: newWorkDays > 0,
+          workDay:
+            formatDate(newCurrentDate) in overworkDays
+              ? !(formatDate(newCurrentDate) in overworkDays && newWorkDays > 0)
+              : newWorkDays > 0,
         });
-
         newCurrentDate.setDate(newCurrentDate.getDate() + 1);
         newWorkDays--;
 
@@ -48,12 +52,34 @@ function App() {
     setWorkDays(newWorkDays);
   };
 
+  const addOverworkDays = (day, index) => {
+    const newDay = { ...days[index], workDay: !days[index].workDay };
+    setDays([...days.slice(0, index), newDay, ...days.slice(index + 1)]);
+    setOverworkDays([formatDate(day)], day);
+  };
+
+  const formatDate = date =>
+    `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+
+  const setOverworkDays = (key, day) => {
+    if ([key] in overworkDays) {
+      delete overworkDays[key];
+      setLocalStorage('workDays', { ...overworkDays });
+    } else {
+      setLocalStorage('workDays', { ...overworkDays, [key]: day });
+    }
+  };
+
   useEffect(() => {
     fillMonth();
+    if (!overworkDays) {
+      setLocalStorage('workDays', {});
+    }
   }, []);
 
   return (
     <>
+      <button onClick={switchMonth}>next</button>
       <div className="calendar-wrapper">
         <div className="month-main">{months[currentDate.getMonth()].rus}</div>
         <div className="days-name">
@@ -67,15 +93,19 @@ function App() {
         </div>
         <div className="calendar-body">
           {days.length &&
-            days.map(({ fullDate, workDay }) => {
+            days.map(({ fullDate, workDay, id }, index) => {
               if (fullDate) {
                 const weekDay = fullDate.getDay();
                 const day = fullDate.getDate();
+                const isWorkDay = workDay;
+                const isWeekEnd = weekDay == 0 || weekDay == 6;
                 return (
                   <div
                     key={day}
-                    className={`day ${workDay && 'work-day'}
-                    ${(weekDay == 0 || weekDay == 6) && 'week-end'}`}
+                    className={`${isWorkDay ? 'work-day ' : ''}${
+                      isWeekEnd ? 'week-end ' : ''
+                    }day`}
+                    onClick={() => addOverworkDays(fullDate, index)}
                   >
                     {day}
                   </div>
@@ -90,4 +120,4 @@ function App() {
   );
 }
 
-export default App;
+export default memo(App);
