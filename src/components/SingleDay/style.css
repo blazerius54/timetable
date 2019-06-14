@@ -1,0 +1,23 @@
+.day {
+  display: flex;
+  justify-content: center;
+  flex: 1 0 10%;
+  padding: 5px;
+  margin-bottom: 5px;
+  color: #5d5d5d;
+}
+
+.day:hover {
+  color: #fff;
+  background: #60d076;
+  cursor: pointer;
+}
+
+.work-day {
+  background: #70b97f;
+  color: #fff;
+}
+
+.week-end {
+  color: #000;
+}

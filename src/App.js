@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { months } from './data';
 import Legend from './components/Legend';
 import { setLocalStorage, getLocalStorage } from './helpers';
-import SingleDay from './components/SingleDay';
+import Navigation from './components/Navigation';
+import DaysOfWeek from './components/DaysOfWeek';
+import CalendarBody from './components/CalendarBody';
 
 function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -84,39 +86,9 @@ function App() {
         next
       </button>
       <div className="calendar-wrapper">
-        <div className="month-main">{months[currentDate.getMonth()].rus}</div>
-        <div className="days-name">
-          <div>пн</div>
-          <div>вт</div>
-          <div>ср</div>
-          <div>чт</div>
-          <div>пт</div>
-          <div>сб</div>
-          <div>вс</div>
-        </div>
-        <div className="calendar-body">
-          {days.map(({ fullDate, workDay }, index) => {
-            if (fullDate) {
-              const weekDay = fullDate.getDay();
-              const day = fullDate.getDate();
-              const isWorkDay = workDay;
-              const isWeekEnd = weekDay == 0 || weekDay == 6;
-              return (
-                <SingleDay
-                  key={day}
-                  day={day}
-                  fullDate={fullDate}
-                  index={index}
-                  addOverworkDays={addOverworkDays}
-                  classes={`${isWorkDay ? 'work-day ' : ''}${
-                    isWeekEnd ? 'week-end ' : ''
-                  }day`}
-                />
-              );
-            }
-            return <div className="day" key={Math.random()} />;
-          })}
-        </div>
+        <DaysOfWeek />
+        <Navigation month={months[currentDate.getMonth()].rus} />
+        <CalendarBody days={days} addOverworkDays={addOverworkDays} />
       </div>
       <Legend />
     </>

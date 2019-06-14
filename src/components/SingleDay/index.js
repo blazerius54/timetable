@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import './style.css';
 
 class SingleDay extends React.Component {
   shouldComponentUpdate(nextProps) {
