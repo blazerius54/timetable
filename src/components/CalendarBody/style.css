@@ -1,3 +1,9 @@
+.calendar-body {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  width: 100%;
+}
+
 .day {
   display: flex;
   justify-content: center;
