@@ -8,9 +8,10 @@ import CalendarBody from './components/CalendarBody';
 
 function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [workDays, setWorkDays] = useState(2);
+  const [totalWorkDays, setTotalWorkDays] = useState(0);
+  const [workDaysCounter, setWorkDaysCounter] = useState(2);
   const [days, setDays] = useState([]);
-  const overworkDays = getLocalStorage('workDays');
+  const overworkDays = getLocalStorage('workDaysCounter');
 
   const switchMonth = () => {
     const dateWithNewMonth = currentDate;
@@ -30,19 +31,27 @@ function App() {
     ).getDate();
     const elementsToAdd =
       newCurrentDate.getDay() == 0 ? 6 : newCurrentDate.getDay() - 1;
-    let newWorkDays = workDays;
+    let newWorkDays = workDaysCounter;
+    let newWorkDaysTotal = 0;
 
     for (let i = 0; i < totalDays + elementsToAdd; i++) {
       if (i < elementsToAdd) {
         newDays.unshift({});
       } else {
+        const workDay =
+          formatDate(newCurrentDate) in overworkDays
+            ? !(formatDate(newCurrentDate) in overworkDays && newWorkDays > 0)
+            : newWorkDays > 0;
+
+        if (workDay) {
+          newWorkDaysTotal++;
+        }
+
         newDays.push({
           fullDate: new Date(newCurrentDate),
-          workDay:
-            formatDate(newCurrentDate) in overworkDays
-              ? !(formatDate(newCurrentDate) in overworkDays && newWorkDays > 0)
-              : newWorkDays > 0,
+          workDay,
         });
+
         newCurrentDate.setDate(newCurrentDate.getDate() + 1);
         newWorkDays--;
 
@@ -52,7 +61,8 @@ function App() {
       }
     }
     setDays(newDays);
-    setWorkDays(newWorkDays);
+    setWorkDaysCounter(newWorkDays);
+    setTotalWorkDays(newWorkDaysTotal);
   };
 
   const addOverworkDays = (day, index) => {
@@ -67,21 +77,22 @@ function App() {
   const setOverworkDays = (key, day) => {
     if (overworkDays[key]) {
       delete overworkDays[key];
-      setLocalStorage('workDays', { ...overworkDays });
+      setLocalStorage('workDaysCounter', { ...overworkDays });
     } else {
-      setLocalStorage('workDays', { ...overworkDays, [key]: day });
+      setLocalStorage('workDaysCounter', { ...overworkDays, [key]: day });
     }
   };
 
   useEffect(() => {
     if (!overworkDays) {
-      setLocalStorage('workDays', {});
+      setLocalStorage('workDaysCounter', {});
     }
     fillMonth();
   }, []);
 
   return (
     <>
+      {totalWorkDays}
       <button type="button" onClick={switchMonth}>
         next
       </button>
