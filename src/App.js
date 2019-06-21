@@ -5,6 +5,7 @@ import { setLocalStorage, getLocalStorage } from './helpers';
 import Navigation from './components/Navigation';
 import DaysOfWeek from './components/DaysOfWeek';
 import MonthsDays from './components/MonthsDays';
+import Payroll from './components/Payroll';
 
 function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -102,6 +103,7 @@ function App() {
         <MonthsDays days={days} addOverworkDays={addOverworkDays} />
       </div>
       <Legend />
+      <Payroll />
     </>
   );
 }

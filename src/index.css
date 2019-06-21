@@ -69,3 +69,19 @@ button:focus {
   display: flex;
   justify-content: center;
 }
+
+.payroll {
+  line-height: 2em;
+  color: #333333;
+  width: 100%;
+}
+
+.month-payroll {
+  font-size: 1.5em;
+}
+
+.payroll-sub-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
