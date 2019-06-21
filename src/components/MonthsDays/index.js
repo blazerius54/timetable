@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import SingleDay from '../SingleDay';
 import './style.css';
 
-const CalendarBody = ({ days, addOverworkDays }) => (
+const MonthsDays = ({ days, addOverworkDays }) => (
   <div className="calendar-body">
     {days.map(({ fullDate, workDay }, index) => {
       if (fullDate) {
@@ -29,9 +29,9 @@ const CalendarBody = ({ days, addOverworkDays }) => (
   </div>
 );
 
-CalendarBody.propTypes = {
+MonthsDays.propTypes = {
   addOverworkDays: PropTypes.func.isRequired,
   days: PropTypes.array.isRequired,
 };
 
-export default CalendarBody;
+export default MonthsDays;

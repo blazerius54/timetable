@@ -4,7 +4,7 @@ import Legend from './components/Legend';
 import { setLocalStorage, getLocalStorage } from './helpers';
 import Navigation from './components/Navigation';
 import DaysOfWeek from './components/DaysOfWeek';
-import CalendarBody from './components/CalendarBody';
+import MonthsDays from './components/MonthsDays';
 
 function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -99,7 +99,7 @@ function App() {
       <div className="calendar-wrapper">
         <DaysOfWeek />
         <Navigation month={months[currentDate.getMonth()].rus} />
-        <CalendarBody days={days} addOverworkDays={addOverworkDays} />
+        <MonthsDays days={days} addOverworkDays={addOverworkDays} />
       </div>
       <Legend />
     </>
