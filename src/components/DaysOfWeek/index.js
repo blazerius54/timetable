@@ -1,5 +1,6 @@
 import React from 'react';
 import { daysOfWeek } from '../../data';
+import './style.css';
 
 const DaysOfWeek = () => {
   const mndWeek = { ...daysOfWeek, 7: daysOfWeek[0] };

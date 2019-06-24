@@ -1,0 +1,11 @@
+.days-name {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 10px;
+  color: #000;
+}
+
+.days-name div {
+  display: flex;
+  justify-content: center;
+}
