@@ -70,6 +70,8 @@ function App() {
     const newDay = { ...days[index], workDay: !days[index].workDay };
     setDays([...days.slice(0, index), newDay, ...days.slice(index + 1)]);
     setOverworkDays([formatDate(day)], day);
+    const newTotalWorkDays = totalWorkDays + (newDay.workDay ? 1 : -1);
+    setTotalWorkDays(newTotalWorkDays);
   };
 
   const formatDate = date =>
@@ -93,7 +95,6 @@ function App() {
 
   return (
     <>
-      {totalWorkDays}
       <button type="button" onClick={switchMonth}>
         next
       </button>
@@ -103,7 +104,7 @@ function App() {
         <MonthsDays days={days} addOverworkDays={addOverworkDays} />
       </div>
       <Legend />
-      <Payroll />
+      <Payroll totalWorkDays={totalWorkDays} />
     </>
   );
 }
