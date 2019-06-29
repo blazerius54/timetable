@@ -11,19 +11,25 @@ function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [totalWorkDays, setTotalWorkDays] = useState(0);
   const [workDaysCounter, setWorkDaysCounter] = useState(2);
-  const [days, setDays] = useState([]);
+  const [prevMonthCounter, setPrevMonthCounter] = useState(0);
+  const [firstWorkDay] = useState('06 01 2019');
+  const [monthsDays, setMonthsDays] = useState({});
   const overworkDays = getLocalStorage('workDaysCounter');
 
-  const switchMonth = () => {
+  const switchMonth = n => {
     const dateWithNewMonth = currentDate;
-
-    currentDate.setMonth(currentDate.getMonth() + 1);
+    currentDate.setMonth(currentDate.getMonth() + n);
     setCurrentDate(dateWithNewMonth);
     fillMonth();
   };
 
+  const remoteMonth = () => {
+    setWorkDaysCounter(15);
+    switchMonth(-1);
+  };
+
   const fillMonth = () => {
-    const newDays = [];
+    const newMonthsDays = {};
     const newCurrentDate = new Date(currentDate.setDate(1));
     const totalDays = new Date(
       newCurrentDate.getFullYear(),
@@ -32,52 +38,75 @@ function App() {
     ).getDate();
     const elementsToAdd =
       newCurrentDate.getDay() == 0 ? 6 : newCurrentDate.getDay() - 1;
-    let newWorkDays = workDaysCounter;
-    let newWorkDaysTotal = 0;
 
     for (let i = 0; i < totalDays + elementsToAdd; i++) {
       if (i < elementsToAdd) {
-        newDays.unshift({});
+        newMonthsDays[i] = {};
       } else {
+        newMonthsDays[formatDate(newCurrentDate)] = {
+          fullDate: new Date(newCurrentDate),
+        };
+        newCurrentDate.setDate(newCurrentDate.getDate() + 1);
+      }
+    }
+    setMonthsDays(newMonthsDays);
+  };
+
+  const fillWorkDays = () => {
+    const newMonthsDays = monthsDays;
+    let newWorkDays = workDaysCounter;
+    let newWorkDaysTotal = 0;
+
+
+    Object.keys(monthsDays).map((key, index) => {
+      if (monthsDays[key].fullDate) {
         const workDay =
-          formatDate(newCurrentDate) in overworkDays
-            ? !(formatDate(newCurrentDate) in overworkDays && newWorkDays > 0)
+          formatDate(monthsDays[key].fullDate) in overworkDays
+            ? !(formatDate(monthsDays[key].fullDate) in overworkDays && newWorkDays > 0)
             : newWorkDays > 0;
 
-        if (workDay) {
-          newWorkDaysTotal++;
-        }
-
-        newDays.push({
-          fullDate: new Date(newCurrentDate),
+        newMonthsDays[key] = {
+          ...monthsDays[key],
           workDay,
-        });
+        };
 
-        newCurrentDate.setDate(newCurrentDate.getDate() + 1);
         newWorkDays--;
 
         if (newWorkDays == -2) {
           newWorkDays = 2;
         }
+
+        if (workDay) {
+          newWorkDaysTotal++;
+        }
+        setTotalWorkDays(newWorkDaysTotal);
+        setWorkDaysCounter(newWorkDays);
       }
-    }
-    setDays(newDays);
-    setWorkDaysCounter(newWorkDays);
-    setTotalWorkDays(newWorkDaysTotal);
+    });
   };
 
-  const addOverworkDays = (day, index) => {
-    const newDay = { ...days[index], workDay: !days[index].workDay };
-    setDays([...days.slice(0, index), newDay, ...days.slice(index + 1)]);
-    setOverworkDays([formatDate(day)], day);
-    const newTotalWorkDays = totalWorkDays + (newDay.workDay ? 1 : -1);
-    setTotalWorkDays(newTotalWorkDays);
+  const addOverworkDays = formatedDate => {
+    const newDay = {
+      ...monthsDays[formatedDate],
+      workDay: !monthsDays[formatedDate].workDay,
+    };
+
+    const newMonthsDays = {
+      ...monthsDays,
+      [formatedDate]: {
+        ...newDay,
+      },
+    };
+
+    // setMonthsDays(newMonthsDays);
+    setOverworkDays(formatedDate, newDay);
   };
 
   const formatDate = date =>
     `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 
   const setOverworkDays = (key, day) => {
+    console.log(key, day)
     if (overworkDays[key]) {
       delete overworkDays[key];
       setLocalStorage('workDaysCounter', { ...overworkDays });
@@ -93,15 +122,25 @@ function App() {
     fillMonth();
   }, []);
 
+  useEffect(() => {
+    fillWorkDays();
+  }, [monthsDays]);
   return (
     <>
-      <button type="button" onClick={switchMonth}>
+      {/* <button type="button" onClick={() => switchMonth(-1)}> */}
+      <button type="button" onClick={remoteMonth}>
+        prev
+      </button>
+      <button type="button" onClick={() => switchMonth(1)}>
         next
       </button>
+      {/* <button type="button" onClick={() => setWorkDaysCounter(1)}> */}
+      {/*  foo */}
+      {/* </button> */}
       <div className="calendar-wrapper">
         <DaysOfWeek />
         <Navigation month={months[currentDate.getMonth()].rus} />
-        <MonthsDays days={days} addOverworkDays={addOverworkDays} />
+        <MonthsDays monthsDays={monthsDays} addOverworkDays={addOverworkDays} />
       </div>
       <Legend />
       <Payroll totalWorkDays={totalWorkDays} />

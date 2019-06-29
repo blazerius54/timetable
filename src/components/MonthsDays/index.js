@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import SingleDay from '../SingleDay';
 import './style.css';
 
-const MonthsDays = ({ days, addOverworkDays }) => (
+const MonthsDays = ({ monthsDays, addOverworkDays }) => (
   <div className="calendar-body">
-    {days.map(({ fullDate, workDay }, index) => {
+    {Object.keys(monthsDays).map(key => {
+      const { fullDate, workDay } = monthsDays[key];
       if (fullDate) {
         const weekDay = fullDate.getDay();
         const day = fullDate.getDate();
@@ -15,8 +16,7 @@ const MonthsDays = ({ days, addOverworkDays }) => (
           <SingleDay
             key={day}
             day={day}
-            fullDate={fullDate}
-            index={index}
+            formatedDate={key}
             addOverworkDays={addOverworkDays}
             classes={`${isWorkDay ? 'work-day ' : ''}${
               isWeekEnd ? 'week-end ' : ''
@@ -31,7 +31,7 @@ const MonthsDays = ({ days, addOverworkDays }) => (
 
 MonthsDays.propTypes = {
   addOverworkDays: PropTypes.func.isRequired,
-  days: PropTypes.array.isRequired,
+  monthsDays: PropTypes.object.isRequired,
 };
 
 export default MonthsDays;

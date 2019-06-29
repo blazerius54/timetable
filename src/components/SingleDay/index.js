@@ -10,8 +10,8 @@ class SingleDay extends React.Component {
   }
 
   changeDayStatus = () => {
-    const { addOverworkDays, fullDate, index } = this.props;
-    addOverworkDays(fullDate, index);
+    const { addOverworkDays, formatedDate } = this.props;
+    addOverworkDays(formatedDate);
   };
 
   render() {
@@ -28,8 +28,7 @@ SingleDay.propTypes = {
   addOverworkDays: PropTypes.func.isRequired,
   classes: PropTypes.string.isRequired,
   day: PropTypes.number.isRequired,
-  index: PropTypes.number.isRequired,
-  fullDate: PropTypes.object.isRequired,
+  formatedDate: PropTypes.string.isRequired,
 };
 
 export default SingleDay;
