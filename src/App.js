@@ -57,12 +57,14 @@ function App() {
     let newWorkDays = workDaysCounter;
     let newWorkDaysTotal = 0;
 
-
-    Object.keys(monthsDays).map((key, index) => {
+    Object.keys(monthsDays).map(key => {
       if (monthsDays[key].fullDate) {
         const workDay =
           formatDate(monthsDays[key].fullDate) in overworkDays
-            ? !(formatDate(monthsDays[key].fullDate) in overworkDays && newWorkDays > 0)
+            ? !(
+              formatDate(monthsDays[key].fullDate) in overworkDays &&
+                newWorkDays > 0
+            )
             : newWorkDays > 0;
 
         newMonthsDays[key] = {
@@ -91,14 +93,13 @@ function App() {
       workDay: !monthsDays[formatedDate].workDay,
     };
 
-    const newMonthsDays = {
-      ...monthsDays,
-      [formatedDate]: {
-        ...newDay,
-      },
-    };
+    let newMonthsDays = monthsDays;
 
-    // setMonthsDays(newMonthsDays);
+    newMonthsDays = {
+      ...newMonthsDays,
+      [formatedDate]: newDay,
+    };
+    setMonthsDays(newMonthsDays);
     setOverworkDays(formatedDate, newDay);
   };
 
@@ -106,7 +107,6 @@ function App() {
     `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 
   const setOverworkDays = (key, day) => {
-    console.log(key, day)
     if (overworkDays[key]) {
       delete overworkDays[key];
       setLocalStorage('workDaysCounter', { ...overworkDays });
@@ -134,9 +134,6 @@ function App() {
       <button type="button" onClick={() => switchMonth(1)}>
         next
       </button>
-      {/* <button type="button" onClick={() => setWorkDaysCounter(1)}> */}
-      {/*  foo */}
-      {/* </button> */}
       <div className="calendar-wrapper">
         <DaysOfWeek />
         <Navigation month={months[currentDate.getMonth()].rus} />
