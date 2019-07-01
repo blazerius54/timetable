@@ -24,11 +24,6 @@ function App() {
     fillMonth();
   };
 
-  const remoteMonth = () => {
-    setWorkDaysCounter(15);
-    switchMonth(-1);
-  };
-
   const fillMonth = () => {
     const newMonthsDays = {};
     const newCurrentDate = new Date(currentDate.setDate(1));
@@ -64,13 +59,16 @@ function App() {
 
     month.map(key => {
       if (monthsDays[key].fullDate) {
-        const workDay =
-          formatDate(monthsDays[key].fullDate) in overworkDays
-            ? !(
-              formatDate(monthsDays[key].fullDate) in overworkDays &&
-                newWorkDays > 0
-            )
-            : newWorkDays > 0;
+        // const workDay =
+        //   formatDate(monthsDays[key].fullDate) in overworkDays
+            // ? !(
+            //   formatDate(monthsDays[key].fullDate) in overworkDays &&
+            //     newWorkDays > 0
+            // )
+            // : newWorkDays > 0;
+
+        const workDay = formatDate(monthsDays[key].fullDate) in overworkDays || newWorkDays > 0;
+
 
         newMonthsDays[key] = {
           ...monthsDays[key],
@@ -111,17 +109,19 @@ function App() {
   };
 
   const addOverworkDays = formatedDate => {
+    console.log(formatedDate)
+    let newMonthsDays = {...monthsDays};
     const newDay = {
-      ...monthsDays[formatedDate],
-      workDay: !monthsDays[formatedDate].workDay,
-    };
-
-    let newMonthsDays = monthsDays;
+      ...newMonthsDays[formatedDate],
+      workDay: !newMonthsDays[formatedDate].workDay,
+    }
 
     newMonthsDays = {
       ...newMonthsDays,
       [formatedDate]: newDay,
     };
+
+    console.log('start', newMonthsDays);
     setMonthsDays(newMonthsDays);
     setOverworkDays(formatedDate, newDay);
   };
@@ -150,8 +150,8 @@ function App() {
   }, [monthsDays]);
   return (
     <>
-      {/* <button type="button" onClick={() => switchMonth(-1)}> */}
-      <button type="button" onClick={remoteMonth}>
+      <button type="button" onClick={addOverworkDays}>asd</button>
+      <button type="button" onClick={() => switchMonth(-1)}>
         prev
       </button>
       <button type="button" onClick={() => switchMonth(1)}>
