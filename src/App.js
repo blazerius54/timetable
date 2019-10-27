@@ -115,9 +115,9 @@ function App() {
   };
 
   const addOverworkDays = formattedDate => {
-    const workDay = !newMonthsDays[formattedDate].workDay;
-    let newMonthsDays = { ...monthsDays };
+    let newMonthsDays = monthsDays;
     let newTotalWorkDays = totalWorkDays;
+    const workDay = !newMonthsDays[formattedDate].workDay;
 
     const newDay = {
       ...newMonthsDays[formattedDate],
@@ -176,7 +176,7 @@ function App() {
         <MonthsDays monthsDays={monthsDays} addOverworkDays={addOverworkDays} />
       </div>
       <Legend />
-       <Payroll totalWorkDays={totalWorkDays} />
+      <Payroll totalWorkDays={totalWorkDays} />
     </>
   );
 }
