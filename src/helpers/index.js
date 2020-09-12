@@ -3,6 +3,9 @@ export const setLocalStorage = (name, obj) => {
 };
 
 export const getLocalStorage = obj => {
-  const result = localStorage.getItem(obj);
-  return JSON.parse(result);
+  try {
+    return localStorage.getItem(obj);
+  } catch (e) {
+    return e;
+  }
 };

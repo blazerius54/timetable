@@ -11,12 +11,20 @@ function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [totalWorkDays, setTotalWorkDays] = useState(0);
   const [workDaysCounter, setWorkDaysCounter] = useState(2);
-  const [prevMonthCounter, setPrevMonthCounter] = useState(1);
+  const [prevMonthCounter, setPrevMonthCounter] = useState(null);
+  const [nextMonthCounter, setNextMonthCounter] = useState(null);
   const [remoteDirection, setDirection] = useState(1);
   const [monthsDays, setMonthsDays] = useState({});
   const overworkDays = getLocalStorage('workDaysCounter');
 
+  useEffect(() => {
+    setWorkDaysCounter(nextMonthCounter);
+    console.log({ workDaysCounter, nextMonthCounter });
+  }, [nextMonthCounter]);
+
   const switchMonth = n => {
+    console.log('switchMonth', prevMonthCounter, nextMonthCounter);
+    // setWorkDaysCounter(nextMonthCounter)
     const dateWithNewMonth = currentDate;
     currentDate.setMonth(currentDate.getMonth() + n);
     setCurrentDate(dateWithNewMonth);
@@ -35,19 +43,44 @@ function App() {
     const elementsToAdd =
       newCurrentDate.getDay() == 0 ? 6 : newCurrentDate.getDay() - 1;
 
-    for (let i = 0; i < totalDays + elementsToAdd; i++) {
+    for (
+      let i = 0, j = workDaysCounter;
+      i < totalDays + elementsToAdd;
+      i++, j--
+    ) {
+      // console.log(newCurrentDate)
+      const workDay = j >= 0;
+
       if (i < elementsToAdd) {
         newMonthsDays[i] = {};
       } else {
         newMonthsDays[formatDate(newCurrentDate)] = {
           fullDate: new Date(newCurrentDate),
+          workDay,
+          j,
         };
         newCurrentDate.setDate(newCurrentDate.getDate() + 1);
       }
+
+      if (j === -2) {
+        j = 2;
+      }
     }
 
+    const daysValues = Object.values(newMonthsDays);
+
+    const [firstDay, secondDay] = [
+      daysValues[elementsToAdd],
+      daysValues[elementsToAdd + 1],
+    ];
+    const [lastDay, preLastDay] = daysValues.slice(-2);
+
+    console.log(newMonthsDays, lastDay.workDay - preLastDay.workDay);
+    setNextMonthCounter(lastDay.workDay - preLastDay.workDay);
+
+    // console.log({ firstDay, secondDay, lastDay, preLastDay, nextMonthCounter: lastDay.workDay - preLastDay.workDay});
+
     setMonthsDays(newMonthsDays);
-    fillWorkDays(newMonthsDays);
   };
 
   const fillWorkDays = days => {
@@ -55,43 +88,48 @@ function App() {
       return;
     }
 
+    console.log(days);
+
     const forwardDirection = remoteDirection > -1;
     const newMonthsDays = days;
     const month = forwardDirection
       ? Object.keys(days)
       : Object.keys(days).reverse();
-    let newWorkDays = forwardDirection ? workDaysCounter : prevMonthCounter;
-    let newWorkDaysTotal = 0;
+    const newWorkDays = forwardDirection ? workDaysCounter : prevMonthCounter;
+    const newWorkDaysTotal = 0;
 
-    month.forEach(key => {
-      if (days[key].fullDate) {
-        // const workDay =
-        //   formatDate(monthsDays[key].fullDate) in overworkDays
-        // ? !(
-        //   formatDate(monthsDays[key].fullDate) in overworkDays &&
-        //     newWorkDays > 0
-        // )
-        // : newWorkDays > 0;
-
-        const workDay =
-          formatDate(days[key].fullDate) in overworkDays || newWorkDays > 0;
-
-        newWorkDays--;
-
-        if (newWorkDays == -2) {
-          newWorkDays = 2;
-        }
-
-        if (workDay) {
-          newWorkDaysTotal++;
-        }
-
-        newMonthsDays[key] = {
-          ...days[key],
-          workDay,
-        };
-      }
-    });
+    // month.forEach(key => {
+    //   if (days[key].fullDate) {
+    //     if (!overworkDays) {
+    //       setLocalStorage('workDaysCounter', {});
+    //     }
+    //     // const workDay =
+    //     //   formatDate(monthsDays[key].fullDate) in overworkDays
+    //     //     ? !(
+    //     //       formatDate(monthsDays[key].fullDate) in overworkDays &&
+    //     //         newWorkDays > 0
+    //     //       )
+    //     //     : newWorkDays > 0;
+    //
+    //     const workDay =
+    //       overworkDays && formatDate(days[key].fullDate) in overworkDays || newWorkDays > 0;
+    //
+    //     newWorkDays--;
+    //
+    //     if (newWorkDays == -2) {
+    //       newWorkDays = 2;
+    //     }
+    //
+    //     if (workDay) {
+    //       newWorkDaysTotal++;
+    //     }
+    //
+    //     newMonthsDays[key] = {
+    //       ...days[key],
+    //       workDay,
+    //     };
+    //   }
+    // });
 
     setTotalWorkDays(newWorkDaysTotal);
     setMonthsDays(days);
