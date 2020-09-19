@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { months } from './data';
 import Legend from './components/Legend';
-import { setLocalStorage, getLocalStorage, monthDaysCounter } from './helpers';
+import {
+  setLocalStorage,
+  getLocalStorage,
+  monthDaysCounter,
+  formMontDays,
+} from './helpers';
 import Navigation from './components/Navigation';
 import DaysOfWeek from './components/DaysOfWeek';
 import MonthsDays from './components/MonthsDays';
@@ -13,26 +18,36 @@ function App() {
   const [workDaysCounter, setWorkDaysCounter] = useState(2);
   const [prevMonthCounter, setPrevMonthCounter] = useState(null);
   const [nextMonthCounter, setNextMonthCounter] = useState(null);
-  const [remoteDirection, setDirection] = useState(1);
+  const [currentDirection, setCurrentDirection] = useState(1);
   const [monthsDays, setMonthsDays] = useState({});
   const overworkDays = getLocalStorage('workDaysCounter');
 
-  useEffect(() => {
-    setWorkDaysCounter(nextMonthCounter);
-    console.log({ workDaysCounter, nextMonthCounter });
-  }, [nextMonthCounter]);
+  // useEffect(() => {
+  //   if (currentDirection > 0) {
+  //     console.log(nextMonthCounter)
+  //     setWorkDaysCounter(nextMonthCounter);
+  //   }
+  //
+  //   if (currentDirection < 0) {
+  //     setWorkDaysCounter(prevMonthCounter);
+  //   }
+  // }, [nextMonthCounter, prevMonthCounter, currentDirection]);
 
-  const switchMonth = n => {
-    console.log('switchMonth', prevMonthCounter, nextMonthCounter);
+  // useEffect(() => {
+  //   console.log(workDaysCounter);
+  // }, [workDaysCounter, currentDirection]);
+
+  const switchMonth = direction => {
     // setWorkDaysCounter(nextMonthCounter)
     const dateWithNewMonth = currentDate;
-    currentDate.setMonth(currentDate.getMonth() + n);
+    currentDate.setMonth(currentDate.getMonth() + direction);
     setCurrentDate(dateWithNewMonth);
-    setDirection(n);
-    fillMonth();
+    setCurrentDirection(direction);
+    // console.log(direction)
+    fillMonth(direction);
   };
 
-  const setExtremeDaysStatus = (monthDays, elementsToAdd) => {
+  const setExtremeDaysStatus = (monthDays, elementsToAdd, direction) => {
     const daysValues = Object.values(monthDays);
 
     const [firstDay, secondDay] = [
@@ -40,48 +55,33 @@ function App() {
       daysValues[elementsToAdd + 1],
     ];
     const [preLastDay, lastDay] = daysValues.slice(-2);
-
-    const result =
+    // console.log({ preLastDay, lastDay });
+    const futureResult =
       Number(lastDay.workDay) === 0 && Number(preLastDay.workDay) === 0
         ? 2
         : lastDay.workDay - preLastDay.workDay;
-    setNextMonthCounter(result);
+
+    const pastResult =
+      Number(firstDay.workDay) === 0 && Number(secondDay.workDay) === 0
+        ? 2
+        : firstDay.workDay - secondDay.workDay;
+
+    console.log({pastResult, futureResult, workDaysCounter});
+    // setPrevMonthCounter(pastResult);
+    // setNextMonthCounter(futureResult);
+
+    setWorkDaysCounter(direction > 0 || !direction ? futureResult : pastResult);
+
   };
 
-  const fillMonth = () => {
-    const newMonthsDays = {};
-    const newCurrentDate = new Date(currentDate.setDate(1));
-    const totalDays = monthDaysCounter(newCurrentDate);
-    const elementsToAdd =
-      newCurrentDate.getDay() == 0 ? 6 : newCurrentDate.getDay() - 1;
+  const fillMonth = direction => {
+    const { newMonthsDays, elementsToAdd } = formMontDays(
+      currentDate,
+      workDaysCounter,
+      direction,
+    );
 
-    for (
-      let i = 0, j = workDaysCounter;
-      i < totalDays + elementsToAdd;
-      i++, j--
-    ) {
-      if (i === elementsToAdd) {
-        j = workDaysCounter;
-      }
-
-      if (j === -2) {
-        j = 2;
-      }
-
-      const workDay = j > 0;
-
-      if (i < elementsToAdd) {
-        newMonthsDays[i] = {};
-      } else {
-        newMonthsDays[formatDate(newCurrentDate)] = {
-          fullDate: new Date(newCurrentDate),
-          workDay,
-        };
-        newCurrentDate.setDate(newCurrentDate.getDate() + 1);
-      }
-    }
-
-    setExtremeDaysStatus(newMonthsDays, elementsToAdd);
+    setExtremeDaysStatus(newMonthsDays, elementsToAdd, direction);
     setMonthsDays(newMonthsDays);
   };
 
@@ -110,8 +110,8 @@ function App() {
     setTotalWorkDays(newTotalWorkDays);
   };
 
-  const formatDate = date =>
-    `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+  // const formatDate = date =>
+  //   `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 
   // const setOverworkDays = (key, day) => {
   //   if (overworkDays[key]) {
