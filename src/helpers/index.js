@@ -22,22 +22,25 @@ const lastDayOfMonth = date => {
   // return new Date(lastDayOfCurrentMonth).getDate();
 };
 
-export const formMontDays = (currentDate, workDaysCounter, direction) => {
-  // console.log(new Date().setDate(lastDayOfMonth(currentDate)));
+export const countDaysToAdd = currentDate => {
+  const firstMontDay = new Date(currentDate.setDate(1));
+  return firstMontDay.getDay() === 0 ? 6 : firstMontDay.getDay() - 1;
+};
 
+// TODO return in app.js ???
+export const formMontDays = (currentDate, workDaysCounter, direction) => {
+  // TODO fix "february" problem
+  console.log({lastDayOfMonth: new Date(lastDayOfMonth(currentDate))})
   let newMonthsDays = {};
   const newCurrentDate =
     direction > 0 || !direction
       ? new Date(currentDate.setDate(1))
       : new Date(lastDayOfMonth(currentDate));
 
-  const firstMontDay = new Date(currentDate.setDate(1));
-
   const totalDays = monthDaysCounter(newCurrentDate);
-  const elementsToAdd =
-    firstMontDay.getDay() == 0 ? 6 : firstMontDay.getDay() - 1;
+  const elementsToAdd = countDaysToAdd(currentDate);
 
-
+  // TODO refactor of loops
   if (direction > 0 || !direction) {
     for (
       let i = 0, j = workDaysCounter;

@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { months } from './data';
 import Legend from './components/Legend';
-import {
-  setLocalStorage,
-  getLocalStorage,
-  monthDaysCounter,
-  formMontDays,
-} from './helpers';
+import { formMontDays, countDaysToAdd } from './helpers';
 import Navigation from './components/Navigation';
 import DaysOfWeek from './components/DaysOfWeek';
 import MonthsDays from './components/MonthsDays';
@@ -20,35 +15,22 @@ function App() {
   const [nextMonthCounter, setNextMonthCounter] = useState(null);
   const [currentDirection, setCurrentDirection] = useState(1);
   const [monthsDays, setMonthsDays] = useState({});
-  const overworkDays = getLocalStorage('workDaysCounter');
 
-  // useEffect(() => {
-  //   if (currentDirection > 0) {
-  //     console.log(nextMonthCounter)
-  //     setWorkDaysCounter(nextMonthCounter);
-  //   }
-  //
-  //   if (currentDirection < 0) {
-  //     setWorkDaysCounter(prevMonthCounter);
-  //   }
-  // }, [nextMonthCounter, prevMonthCounter, currentDirection]);
-
-  // useEffect(() => {
-  //   console.log(workDaysCounter);
-  // }, [workDaysCounter, currentDirection]);
+  useEffect(() => {
+    console.log(currentDate);
+  }, [nextMonthCounter, prevMonthCounter, currentDirection]);
 
   const switchMonth = direction => {
-    // setWorkDaysCounter(nextMonthCounter)
     const dateWithNewMonth = currentDate;
     currentDate.setMonth(currentDate.getMonth() + direction);
     setCurrentDate(dateWithNewMonth);
     setCurrentDirection(direction);
-    // console.log(direction)
     fillMonth(direction);
   };
 
-  const setExtremeDaysStatus = (monthDays, elementsToAdd, direction) => {
+  const setExtremeDaysStatus = monthDays => {
     const daysValues = Object.values(monthDays);
+    const elementsToAdd = countDaysToAdd(currentDate);
 
     const [firstDay, secondDay] = [
       daysValues[elementsToAdd],
@@ -66,22 +48,20 @@ function App() {
         ? 2
         : firstDay.workDay - secondDay.workDay;
 
-    console.log({pastResult, futureResult, workDaysCounter});
-    // setPrevMonthCounter(pastResult);
-    // setNextMonthCounter(futureResult);
-
-    setWorkDaysCounter(direction > 0 || !direction ? futureResult : pastResult);
-
+    setPrevMonthCounter(pastResult);
+    setNextMonthCounter(futureResult);
   };
 
   const fillMonth = direction => {
+    const x = direction > 0 || !direction ? nextMonthCounter : prevMonthCounter;
+
     const { newMonthsDays, elementsToAdd } = formMontDays(
       currentDate,
-      workDaysCounter,
+      x,
       direction,
     );
 
-    setExtremeDaysStatus(newMonthsDays, elementsToAdd, direction);
+    setExtremeDaysStatus(newMonthsDays, elementsToAdd);
     setMonthsDays(newMonthsDays);
   };
 
@@ -110,27 +90,19 @@ function App() {
     setTotalWorkDays(newTotalWorkDays);
   };
 
-  // const formatDate = date =>
-  //   `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-
-  // const setOverworkDays = (key, day) => {
-  //   if (overworkDays[key]) {
-  //     delete overworkDays[key];
-  //     setLocalStorage('workDaysCounter', { ...overworkDays });
-  //   } else {
-  //     setLocalStorage('workDaysCounter', { ...overworkDays, [key]: day });
-  //   }
-  // };
 
   useEffect(() => {
-    // if (!overworkDays) {
-    //   setLocalStorage('workDaysCounter', {});
-    // }
     fillMonth();
   }, []);
 
   return (
     <>
+      <button type="button" onClick={() => console.log(prevMonthCounter)}>
+        log prev month counter
+      </button>
+      <button type="button" onClick={() => console.log(nextMonthCounter)}>
+        log next month counter
+      </button>
       <button type="button" onClick={() => switchMonth(-1)}>
         prev
       </button>
