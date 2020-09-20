@@ -19,7 +19,6 @@ const formatDate = date =>
 const lastDayOfMonth = date => {
   const nextMonth = new Date().setMonth(date.getMonth() + 1);
   return new Date(nextMonth).setDate(0);
-  // return new Date(lastDayOfCurrentMonth).getDate();
 };
 
 export const countDaysToAdd = currentDate => {
@@ -27,44 +26,34 @@ export const countDaysToAdd = currentDate => {
   return firstMontDay.getDay() === 0 ? 6 : firstMontDay.getDay() - 1;
 };
 
-const formDay = (isForwardDirection, currentDate, monthsDays, workDay) => {
+const formDay = isForwardDirection => (currentDate, monthsDays, workDay) => {
   let newMonthsDays = monthsDays;
   const newCurrentDate = currentDate;
+  const dayOperand = isForwardDirection ? 1 : -1;
+
+  const day = {
+    fullDate: new Date(newCurrentDate),
+    workDay,
+  };
 
   if (isForwardDirection) {
-    newMonthsDays[formatDate(newCurrentDate)] = {
-      fullDate: new Date(newCurrentDate),
-      workDay,
-    };
-    newCurrentDate.setDate(newCurrentDate.getDate() + 1);
+    newMonthsDays[formatDate(newCurrentDate)] = day;
   } else {
-    const day = {
-      fullDate: new Date(newCurrentDate),
-      workDay,
-    };
-    const testDay = {};
-    testDay[formatDate(newCurrentDate)] = day;
-    // newDays[formatDate(newCurrentDay)] = day;
-    // newDays = {
-    //   [formatDate(newCurrentDay)]: day,
-    //   ...newDays,
-    // };
     newMonthsDays = {
-      ...testDay,
+      [formatDate(newCurrentDate)]: day,
       ...newMonthsDays,
     };
-    newCurrentDate.setDate(newCurrentDate.getDate() - 1);
   }
-  console.log(newMonthsDays);
+
+  newCurrentDate.setDate(newCurrentDate.getDate() + dayOperand);
 
   return [newCurrentDate, newMonthsDays];
 };
 
 // TODO return in app.js ???
 export const formMontDays = (currentDate, workDaysCounter, direction) => {
-  const isForwardDirection = direction > 0 || !direction ? 1 : 0;
+  const isForwardDirection = direction > 0 || !direction;
   // TODO fix "february" problem
-  // console.log({ lastDayOfMonth: new Date(lastDayOfMonth(currentDate)) });
   let newMonthsDays = {};
   let newCurrentDate = isForwardDirection
     ? new Date(currentDate.setDate(1))
@@ -72,6 +61,7 @@ export const formMontDays = (currentDate, workDaysCounter, direction) => {
 
   const totalDays = monthDaysCounter(newCurrentDate);
   const elementsToAdd = countDaysToAdd(currentDate);
+  const formDayWithDirection = formDay(isForwardDirection);
 
   for (
     let i = 0, j = workDaysCounter;
@@ -91,8 +81,7 @@ export const formMontDays = (currentDate, workDaysCounter, direction) => {
     if (i < elementsToAdd) {
       newMonthsDays[i] = {};
     } else {
-      [newCurrentDate, newMonthsDays] = formDay(
-        isForwardDirection,
+      [newCurrentDate, newMonthsDays] = formDayWithDirection(
         newCurrentDate,
         newMonthsDays,
         workDay,
@@ -100,6 +89,5 @@ export const formMontDays = (currentDate, workDaysCounter, direction) => {
     }
   }
 
-  // console.log(newMonthsDays);
   return { newMonthsDays, elementsToAdd };
 };

@@ -10,7 +10,7 @@ const MonthsDays = ({ monthsDays, addOverworkDays }) => (
       if (fullDate) {
         const weekDay = fullDate.getDay();
         const day = fullDate.getDate();
-        const isWeekEnd = weekDay == 0 || weekDay == 6;
+        const isWeekEnd = weekDay === 0 || weekDay === 6;
         return (
           <SingleDay
             key={day}

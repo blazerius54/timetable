@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { months } from './data';
 import Legend from './components/Legend';
 import { formMontDays, countDaysToAdd } from './helpers';
@@ -10,21 +10,16 @@ import Payroll from './components/Payroll';
 function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [totalWorkDays, setTotalWorkDays] = useState(0);
-  const [workDaysCounter, setWorkDaysCounter] = useState(2);
   const [prevMonthCounter, setPrevMonthCounter] = useState(null);
   const [nextMonthCounter, setNextMonthCounter] = useState(null);
-  const [currentDirection, setCurrentDirection] = useState(1);
   const [monthsDays, setMonthsDays] = useState({});
-
-  // useEffect(() => {
-  //   console.log(currentDate);
-  // }, [nextMonthCounter, prevMonthCounter, currentDirection]);
 
   const switchMonth = direction => {
     const dateWithNewMonth = currentDate;
-    currentDate.setMonth(currentDate.getMonth() + direction);
+    const month = currentDate.getMonth() + direction;
+    console.log(month)
+    currentDate.setMonth(month);
     setCurrentDate(dateWithNewMonth);
-    setCurrentDirection(direction);
     fillMonth(direction);
   };
 
@@ -37,7 +32,6 @@ function App() {
       daysValues[elementsToAdd + 1],
     ];
     const [preLastDay, lastDay] = daysValues.slice(-2);
-    // console.log({ preLastDay, lastDay });
     const futureResult =
       Number(lastDay.workDay) === 0 && Number(preLastDay.workDay) === 0
         ? 2
@@ -53,16 +47,18 @@ function App() {
   };
 
   const fillMonth = direction => {
-    const x = direction > 0 || !direction ? nextMonthCounter : prevMonthCounter;
+    const counter =
+      direction > 0 || !direction ? nextMonthCounter : prevMonthCounter;
 
     const { newMonthsDays, elementsToAdd } = formMontDays(
       currentDate,
-      x,
+      counter,
       direction,
     );
 
     setExtremeDaysStatus(newMonthsDays, elementsToAdd);
     setMonthsDays(newMonthsDays);
+    console.log(Object.values(newMonthsDays)[10])
   };
 
   const addOverworkDays = formattedDate => {
@@ -89,7 +85,6 @@ function App() {
     setMonthsDays(newMonthsDays);
     setTotalWorkDays(newTotalWorkDays);
   };
-
 
   useEffect(() => {
     fillMonth();

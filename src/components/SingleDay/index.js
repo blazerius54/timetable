@@ -10,7 +10,7 @@ class SingleDay extends React.Component {
   }
 
   changeDayStatus = () => {
-    const { addOverworkDays, formattedDate, day, workDay } = this.props;
+    const { addOverworkDays, formattedDate } = this.props;
     addOverworkDays(formattedDate);
   };
 
