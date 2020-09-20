@@ -16,9 +16,9 @@ function App() {
   const [currentDirection, setCurrentDirection] = useState(1);
   const [monthsDays, setMonthsDays] = useState({});
 
-  useEffect(() => {
-    console.log(currentDate);
-  }, [nextMonthCounter, prevMonthCounter, currentDirection]);
+  // useEffect(() => {
+  //   console.log(currentDate);
+  // }, [nextMonthCounter, prevMonthCounter, currentDirection]);
 
   const switchMonth = direction => {
     const dateWithNewMonth = currentDate;
